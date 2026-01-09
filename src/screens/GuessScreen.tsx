@@ -1,8 +1,9 @@
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { OptionKey, Pair } from "../game/types";
 import { styles } from "../styles/styles";
+import { ChoiceCard } from "../ui/ChoiceCard";
 
 /**
  * =========================================
@@ -41,13 +42,18 @@ export function GuessScreen(props: Props) {
 
           <View style={{ height: 12 }} />
 
-          <Pressable style={styles.choiceBtn} onPress={() => onGuess("A")}>
-            <Text style={styles.choiceText}>A: {pair.A}</Text>
-          </Pressable>
+          <ChoiceCard
+                title={`A: ${pair.A}`}
+                imageSource={require("../../assets/a.jpeg")}
+                onPress={() => onGuess("A")}
+                />
 
-          <Pressable style={styles.choiceBtn} onPress={() => onGuess("B")}>
-            <Text style={styles.choiceText}>B: {pair.B}</Text>
-          </Pressable>
+                <ChoiceCard
+                title={`B: ${pair.B}`}
+                imageSource={require("../../assets/b.jpeg")}
+                onPress={() => onGuess("B")}
+            />
+
         </View>
 
         <Text style={styles.muted}>{progressText}</Text>

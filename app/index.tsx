@@ -1,3 +1,4 @@
+import { PassScreen } from "@/src/screens/PassScreen";
 import React, { useEffect, useMemo, useState } from "react";
 import { PAIRS } from "../src/game/pairs";
 import type { OptionKey, Phase, Player } from "../src/game/types";
@@ -140,7 +141,7 @@ export default function Index() {
 
   /**
    * =========================================
-   * 5) SETUP FUNCTIONS – add/remove/select target
+   * 5) SETUP FUNCTIONS – add/remove/select target/reset score
    * =========================================
    */
 
@@ -184,6 +185,18 @@ export default function Index() {
     });
   }
 
+  function resetScores() {
+    setScores((prev) => {
+      const next: Record<string, number> = { ...prev };
+  
+      for (const p of players) {
+        next[p.id] = 0;
+      }
+  
+      return next;
+    });
+  }
+  
   /**
    * =========================================
    * 6) GAME FLOW FUNCTIONS – start/pick/guess/result
@@ -197,8 +210,8 @@ export default function Index() {
     setPicked(null);
     setGuesses({});
     setGuesserCursor(0);
-
-    setPhase("PICK");
+    // Nejdřív ukážeme předdání telefonu cílovému hráči.
+    setPhase("PASS_TO_TARGET");
   }
 
   function pickOption(option: OptionKey) {
@@ -206,56 +219,88 @@ export default function Index() {
 
     setGuesses({});
     setGuesserCursor(0);
-
-    setPhase("GUESS");
+    // Po tajné volbě předáme telefon prvnímu tipujícímu.
+    setPhase("PASS_TO_GUESSOR");
   }
 
   function submitGuess(option: OptionKey) {
     if (!currentGuesser) return;
-
-    setGuesses((prev) => ({
-      ...prev,
+  
+    /**
+     * nextGuesses = vytvoříme “finální” guesses objekt pro tento krok.
+     * Důležité:
+     * - musíme do něj zahrnout i právě zadaný tip
+     * - protože setGuesses je async a v tenhle moment by ve state ještě nebyl
+     */
+    const nextGuesses: Record<string, OptionKey> = {
+      ...guesses,
       [currentGuesser.id]: option,
-    }));
-
+    };
+  
+    // uložíme tip do state
+    setGuesses(nextGuesses);
+  
     const nextCursor = guesserCursor + 1;
-
+  
+    // pokud existuje další tipující, posuneme cursor a ukážeme předání telefonu
     if (nextCursor < guesserIds.length) {
       setGuesserCursor(nextCursor);
+      setPhase("PASS_TO_GUESSOR");
       return;
     }
-
-    setPhase("RESULT");
-  }
-
-  function applyScoresAndNextRound() {
-    if (!picked || !targetId) return;
-
+  
+    /**
+     * Pokud jsme tady:
+     * - právě tipoval poslední tipující
+     * - teď je správný moment přičíst body (ať už uživatel pak klikne kamkoliv)
+     */
+    if (!picked || !targetId) {
+      // bezpečnostní pojistka (normálně by picked/targetId měly být nastavené)
+      setPhase("RESULT");
+      return;
+    }
+  
     setScores((prev) => {
       const next = { ...prev };
-
+  
       for (const gid of guesserIds) {
-        const g = guesses[gid];
+        const g = nextGuesses[gid];
         if (g && g === picked) {
           next[gid] = (next[gid] ?? 0) + 1;
         } else {
           next[gid] = next[gid] ?? 0;
         }
       }
-
+  
+      // targetovi skóre neměníme (zatím)
       next[targetId] = next[targetId] ?? 0;
-
+  
       return next;
     });
+  
+    // teprve potom ukážeme RESULT
+    setPhase("RESULT");
+  }
+  
 
+  function applyScoresAndNextRound() {
+    /**
+     * Skóre už je přičtené při přechodu do RESULT.
+     * Tady jen příprava dalšího kola.
+     */
+  
+    // další dvojice (cyklicky)
     setPairIndex((prev) => (prev + 1) % PAIRS.length);
-
+  
+    // reset kola
     setPicked(null);
     setGuesses({});
     setGuesserCursor(0);
-
-    setPhase("PICK");
+  
+    // předání telefonu cílovému hráči pro další tajnou volbu
+    setPhase("PASS_TO_TARGET");
   }
+  
 
   /**
    * =========================================
@@ -304,10 +349,22 @@ export default function Index() {
         canStart={canStart}
         onStartGame={startGame}
         hydrated={hydrated}
+        onResetScores={resetScores}
       />
     );
   }
 
+  if (phase === "PASS_TO_TARGET") {
+    return (
+        <PassScreen
+            title="Předání telefonu"
+            instruction="Telefon vezme (cílová hráč):"
+            playerName={targetPlayerName ?? "?"}
+            buttonText="Jsem připraven"
+            onContinue={() => setPhase("PICK")}
+        />
+    )
+  }
   if (phase === "PICK") {
     return (
       <PickScreen
@@ -316,6 +373,18 @@ export default function Index() {
         onPick={pickOption}
       />
     );
+  }
+
+  if (phase === "PASS_TO_GUESSOR") {
+    return (
+        <PassScreen
+            title="Předání telefonu"
+            instruction="Telefon vezme (tipující)"
+            playerName={currentGuesserName}
+            buttonText="Jsem připraven"
+            onContinue={() => setPhase("GUESS")}
+        />
+    )
   }
 
   if (phase === "GUESS") {

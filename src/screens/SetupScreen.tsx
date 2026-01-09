@@ -28,6 +28,8 @@ type Props = {
   onStartGame: () => void;
 
   hydrated: boolean;
+
+  onResetScores: () => void;
 };
 
 export function SetupScreen(props: Props) {
@@ -44,6 +46,7 @@ export function SetupScreen(props: Props) {
     canStart,
     onStartGame,
     hydrated,
+    onResetScores,
   } = props;
 
   return (
@@ -121,6 +124,10 @@ export function SetupScreen(props: Props) {
             onPress={onStartGame}
           >
             <Text style={styles.btnText}>Start</Text>
+          </Pressable>
+
+          <Pressable style={styles.btnGhost} onPress={onResetScores}>
+            <Text style={styles.btnGhostText}>Reset Skóre</Text>
           </Pressable>
 
           {!canStart && (

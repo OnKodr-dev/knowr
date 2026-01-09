@@ -14,7 +14,10 @@ export type Pair = {
   B: string;
 };
 
-export type Phase = "SETUP" | "PICK" | "GUESS" | "RESULT";
+/**
+ * Phase = fáze hry (state machine).
+ */
+export type Phase = "SETUP" | "PASS_TO_TARGET" | "PICK" | "PASS_TO_GUESSOR" | "GUESS" | "RESULT";
 
 /**
  * PersistedState = přesně to, co ukládáme do AsyncStorage.

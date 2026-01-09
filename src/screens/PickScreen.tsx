@@ -1,8 +1,9 @@
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { OptionKey, Pair } from "../game/types";
 import { styles } from "../styles/styles";
+import { ChoiceCard } from "../ui/ChoiceCard";
 
 /**
  * =========================================
@@ -34,13 +35,17 @@ export function PickScreen(props: Props) {
 
           <View style={{ height: 12 }} />
 
-          <Pressable style={styles.choiceBtn} onPress={() => onPick("A")}>
-            <Text style={styles.choiceText}>A: {pair.A}</Text>
-          </Pressable>
+          <ChoiceCard
+            title={`A: ${pair.A}`}
+            imageSource={require("../../assets/a.jpeg")}
+            onPress={() => onPick("A")}
+          />
 
-          <Pressable style={styles.choiceBtn} onPress={() => onPick("B")}>
-            <Text style={styles.choiceText}>B: {pair.B}</Text>
-          </Pressable>
+          <ChoiceCard
+            title={`B: ${pair.B}`}
+            imageSource={require("../../assets/b.jpeg")}
+            onPress={() => onPick("B")}
+          />
         </View>
 
         <Text style={styles.muted}>Tipování začne hned po výběru.</Text>

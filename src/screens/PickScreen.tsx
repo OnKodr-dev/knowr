@@ -37,15 +37,16 @@ export function PickScreen(props: Props) {
 
           <ChoiceCard
             title={`A: ${pair.A}`}
-            imageSource={require("../../assets/a.jpeg")}
+            imageSource={pair.imageA}
             onPress={() => onPick("A")}
           />
 
           <ChoiceCard
             title={`B: ${pair.B}`}
-            imageSource={require("../../assets/b.jpeg")}
+            imageSource={pair.imageB}
             onPress={() => onPick("B")}
           />
+
         </View>
 
         <Text style={styles.muted}>Tipování začne hned po výběru.</Text>

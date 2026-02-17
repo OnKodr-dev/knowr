@@ -1,4 +1,5 @@
 import React from "react";
+import type { ImageSourcePropType } from "react-native";
 import { Image, Pressable, Text, View } from "react-native";
 import { styles } from "../styles/styles";
 
@@ -27,7 +28,7 @@ type Props = {
    * imageSource = zdroj obrázku pro React Native <Image>
    * U lokálních obrázků to bude require("...")
    */
-  imageSource: any;
+  imageSource: ImageSourcePropType;
 
   /**
    * onPress = co se stane po kliknutí

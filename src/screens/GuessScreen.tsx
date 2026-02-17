@@ -43,16 +43,17 @@ export function GuessScreen(props: Props) {
           <View style={{ height: 12 }} />
 
           <ChoiceCard
-                title={`A: ${pair.A}`}
-                imageSource={require("../../assets/a.jpeg")}
-                onPress={() => onGuess("A")}
-                />
-
-                <ChoiceCard
-                title={`B: ${pair.B}`}
-                imageSource={require("../../assets/b.jpeg")}
-                onPress={() => onGuess("B")}
+            title={`A: ${pair.A}`}
+            imageSource={pair.imageA}
+            onPress={() => onGuess("A")}
             />
+
+            <ChoiceCard
+            title={`B: ${pair.B}`}
+            imageSource={pair.imageB}
+            onPress={() => onGuess("B")}
+            />
+
 
         </View>
 

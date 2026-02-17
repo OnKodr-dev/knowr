@@ -1,3 +1,4 @@
+import { GameOverScreen } from "@/src/screens/GameOverScreen";
 import { PassScreen } from "@/src/screens/PassScreen";
 import React, { useEffect, useMemo, useState } from "react";
 import { PAIRS } from "../src/game/pairs";
@@ -23,17 +24,19 @@ import {
 export default function Index() {
   /**
    * =========================================
-   * 1) SETUP STATE – hráči + cílový hráč
+   * SETUP STATE – hráči + cílový hráč
    * =========================================
    */
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [newName, setNewName] = useState("");
   const [targetId, setTargetId] = useState<string | null>(null);
+  const [round, setRound ] = useState(1);
+  const MAX_ROUNDS = 10;
 
   /**
    * =========================================
-   * 2) GAME STATE – průběh hry
+   * GAME STATE – průběh hry
    * =========================================
    */
 
@@ -51,7 +54,7 @@ export default function Index() {
 
   /**
    * =========================================
-   * 3) DERIVED VALUES – spočítané hodnoty ze state
+   * DERIVED VALUES – spočítané hodnoty ze state
    * =========================================
    */
 
@@ -79,7 +82,7 @@ export default function Index() {
 
   /**
    * =========================================
-   * 4) PERSISTENCE – LOAD při startu + SAVE při změnách
+   * PERSISTENCE – LOAD při startu + SAVE při změnách
    * =========================================
    */
 
@@ -141,7 +144,7 @@ export default function Index() {
 
   /**
    * =========================================
-   * 5) SETUP FUNCTIONS – add/remove/select target/reset score
+   * SETUP FUNCTIONS – add/remove/select target/reset score/new game
    * =========================================
    */
 
@@ -197,15 +200,38 @@ export default function Index() {
     });
   }
   
+  function newGame() {
+    /**
+     * Nová hra = začneme od nuly:
+     * - reset skóre všech existujících hráčů na 0
+     * - reset průběhu (round, pair, guesses...)
+     * - vrátíme se do SETUP
+     */
+    setScores((prev) => {
+      const next = { ...prev };
+      for (const p of players) next[p.id] = 0;
+      return next;
+    });
+  
+    setRound(1);
+    setPairIndex(0);
+    setPicked(null);
+    setGuesses({});
+    setGuesserCursor(0);
+  
+    setPhase("SETUP");
+  }
+  
   /**
    * =========================================
-   * 6) GAME FLOW FUNCTIONS – start/pick/guess/result
+   * GAME FLOW FUNCTIONS – start/pick/guess/result
    * =========================================
    */
 
   function startGame() {
     if (!canStart) return;
 
+    setRound(1);
     setPairIndex(0);
     setPicked(null);
     setGuesses({});
@@ -283,28 +309,40 @@ export default function Index() {
   }
   
 
-  function applyScoresAndNextRound() {
-    /**
-     * Skóre už je přičtené při přechodu do RESULT.
-     * Tady jen příprava dalšího kola.
-     */
+    function applyScoresAndNextRound() {
+        /**
+         * Skóre už je přičtené při přechodu do RESULT.
+         * Tady řešíme jen:
+         * - jestli hra končí (round >= MAX_ROUNDS)
+         * - nebo připravit další kolo
+         */
+    
+        // Pokud jsme právě dohráli poslední kolo, jdeme na GAME_OVER.
+        if (round >= MAX_ROUNDS) {
+        setPhase("GAME_OVER");
+        return;
+        }
+    
+        // Jinak zvyšujeme číslo kola o 1.
+        setRound((prev) => prev + 1);
+    
+        // další dvojice (cyklicky)
+        setPairIndex((prev) => (prev + 1) % PAIRS.length);
+    
+        // reset kola
+        setPicked(null);
+        setGuesses({});
+        setGuesserCursor(0);
+    
+        // předání telefonu cílovému hráči pro další tajnou volbu
+        setPhase("PASS_TO_TARGET");
+    }
   
-    // další dvojice (cyklicky)
-    setPairIndex((prev) => (prev + 1) % PAIRS.length);
-  
-    // reset kola
-    setPicked(null);
-    setGuesses({});
-    setGuesserCursor(0);
-  
-    // předání telefonu cílovému hráči pro další tajnou volbu
-    setPhase("PASS_TO_TARGET");
-  }
   
 
   /**
    * =========================================
-   * 7) PREP RESULT DATA – připravíme data pro ResultScreen
+   * PREP RESULT DATA – připravíme data pro ResultScreen
    * =========================================
    */
 
@@ -328,9 +366,27 @@ export default function Index() {
     };
   });
 
+    /**
+     * =========================================
+     * GAME OVER DATA – seřazené skóre hráčů
+     * =========================================
+     */
+    const gameOverRows = useMemo(() => {
+        const rows = players.map((p) => ({
+        id: p.id,
+        name: p.name,
+        score: scores[p.id] ?? 0,
+        }));
+    
+        // seřadíme od nejvyššího skóre
+        rows.sort((a, b) => b.score - a.score);
+    
+        return rows;
+    }, [players, scores]);
+    
   /**
    * =========================================
-   * 8) RENDER – vyber obrazovku podle phase
+   * RENDER – vyber obrazovku podle phase
    * =========================================
    */
 
@@ -398,6 +454,11 @@ export default function Index() {
       />
     );
   }
+
+  if (phase === "GAME_OVER") {
+    return <GameOverScreen rows={gameOverRows} onNewGame={newGame} />;
+  }
+  
 
   return (
     <ResultScreen

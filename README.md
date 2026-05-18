@@ -1,50 +1,61 @@
-# Welcome to your Expo app 👋
+# Knowr
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Knowr is a mobile app project built with Expo and React Native.
 
-## Get started
+The repository is used to practice modern mobile app development: routing, navigation, local storage, TypeScript setup and cross-platform development scripts.
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+- Expo Router application structure
+- React Native mobile UI foundation
+- Android, iOS and web development scripts
+- Local storage dependency prepared
+- TypeScript and linting setup
 
-2. Start the app
+## Tech stack
 
-   ```bash
-   npx expo start
-   ```
+- Expo
+- React Native
+- Expo Router
+- TypeScript
+- React Navigation
+- AsyncStorage
 
-In the output, you'll find options to open the app in a
+## Getting started
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Install dependencies:
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Start the app:
 
-## Learn more
+```bash
+npx expo start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Run on a platform:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npm run android
+npm run ios
+npm run web
+```
 
-## Join the community
+Run linting:
 
-Join our community of developers creating universal apps.
+```bash
+npm run lint
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Project status
+
+Work in progress. This project is part of my learning portfolio for mobile development with Expo and React Native.
+
+## What I learned
+
+- Creating and running an Expo project
+- Using Expo Router
+- Preparing a cross-platform mobile app structure
+- Managing dependencies and scripts in a React Native project
